@@ -9,40 +9,25 @@
   <meta name="theme-color" content="#1a2e1a" />
   <title>ProTrack — Protein Tracker</title>
 
-  <!-- PWA manifest -->
   <link rel="manifest" href="manifest.json" />
-
-  <!-- Apple touch icon fallback -->
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
-
-  <!-- Google Fonts: Syne (display) + Outfit (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
-
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-  <!-- ═══════════════════════════════════════
-       APP WRAPPER — screens swap inside here
-       ═══════════════════════════════════════ -->
   <div id="app">
 
-    <!-- ── SCREEN: Account picker (shown first if no active user) ── -->
+    <!-- ── SCREEN: Account picker ── -->
     <div id="screen-account" class="screen active">
       <div class="account-hero">
         <div class="logo-mark">P</div>
         <h1 class="app-title">ProTrack</h1>
         <p class="app-sub">Your personal protein companion</p>
       </div>
-
-      <div class="account-list" id="accountList">
-        <!-- Populated by JS -->
-      </div>
-
+      <div class="account-list" id="accountList"></div>
       <button class="btn btn-primary" id="btnNewAccount">+ Create New Profile</button>
-
-      <!-- New account form (hidden until button clicked) -->
       <div class="new-account-form hidden" id="newAccountForm">
         <h3>Create Your Profile</h3>
         <div class="field-group">
@@ -88,6 +73,7 @@
 
     <!-- ── SCREEN: Main Dashboard ── -->
     <div id="screen-dash" class="screen hidden">
+
       <!-- Top bar -->
       <header class="top-bar">
         <div class="top-bar-left">
@@ -110,33 +96,63 @@
         <span class="health-unit">kcal</span>
       </div>
 
-      <!-- Progress hero -->
+      <!-- Progress hero: dual rings (protein + calories) -->
       <section class="progress-hero">
-        <div class="progress-ring-wrap">
-          <svg class="ring-svg" viewBox="0 0 120 120">
-            <circle class="ring-track" cx="60" cy="60" r="52" />
-            <circle class="ring-fill" id="ringArc" cx="60" cy="60" r="52" />
-          </svg>
-          <div class="ring-inner">
-            <span class="ring-num" id="ringNum">0</span>
-            <span class="ring-unit">g</span>
-            <span class="ring-label">protein</span>
+        <div class="hero-rings">
+
+          <!-- Protein ring (primary) -->
+          <div class="ring-block">
+            <div class="progress-ring-wrap">
+              <svg class="ring-svg" viewBox="0 0 120 120">
+                <circle class="ring-track" cx="60" cy="60" r="52" />
+                <circle class="ring-fill" id="ringArc" cx="60" cy="60" r="52" />
+              </svg>
+              <div class="ring-inner">
+                <span class="ring-num" id="ringNum">0</span>
+                <span class="ring-unit">g</span>
+                <span class="ring-label">protein</span>
+              </div>
+            </div>
+            <div class="ring-block-label">Protein</div>
           </div>
+
+          <!-- Calories ring (secondary) -->
+          <div class="ring-block">
+            <div class="progress-ring-wrap progress-ring-wrap-sm">
+              <svg class="ring-svg" viewBox="0 0 120 120">
+                <circle class="ring-track" cx="60" cy="60" r="52" />
+                <circle class="ring-fill ring-fill-kcal" id="kcalArc" cx="60" cy="60" r="52" />
+              </svg>
+              <div class="ring-inner">
+                <span class="ring-num ring-num-sm" id="kcalRingNum">0</span>
+                <span class="ring-unit">kcal</span>
+                <span class="ring-label">eaten</span>
+              </div>
+            </div>
+            <div class="ring-block-label">Calories</div>
+          </div>
+
         </div>
+
         <div class="progress-stats">
           <div class="stat-pill green">
             <span class="stat-val" id="statConsumed">0g</span>
-            <span class="stat-lbl">consumed</span>
+            <span class="stat-lbl">protein</span>
           </div>
           <div class="stat-pill gray">
             <span class="stat-val" id="statTarget">110g</span>
-            <span class="stat-lbl">target</span>
+            <span class="stat-lbl">p. target</span>
           </div>
           <div class="stat-pill orange">
             <span class="stat-val" id="statRemain">110g</span>
             <span class="stat-lbl">remaining</span>
           </div>
+          <div class="stat-pill kcal-pill">
+            <span class="stat-val" id="statKcal">0</span>
+            <span class="stat-lbl">kcal</span>
+          </div>
         </div>
+
         <div class="big-bar-wrap">
           <div class="big-bar-bg">
             <div class="big-bar-fill" id="bigBarFill"></div>
@@ -146,20 +162,25 @@
         <p class="dynamic-message" id="dynamicMsg"></p>
       </section>
 
+      <!-- Auto Plan section -->
+      <section class="auto-plan-section">
+        <button class="btn btn-plan" id="btnAutoPlan">
+          <span>🤖</span>
+          <span>Auto Plan My Day</span>
+        </button>
+        <p class="plan-hint">Instantly generate a full meal plan to hit your protein goal</p>
+      </section>
+
       <!-- Meal slots -->
       <section class="meals-section">
         <h2 class="section-title">Today's Meals</h2>
-        <div id="mealSlots">
-          <!-- Rendered by JS -->
-        </div>
+        <div id="mealSlots"></div>
       </section>
 
       <!-- Daily summary card -->
       <section class="summary-card" id="summaryCard">
         <h2 class="section-title">Daily Summary</h2>
-        <div class="summary-grid" id="summaryGrid">
-          <!-- Rendered by JS -->
-        </div>
+        <div class="summary-grid" id="summaryGrid"></div>
         <div class="summary-msg" id="summaryMsg"></div>
         <button class="btn btn-ghost small" id="btnResetDay">🔄 Reset Today's Log</button>
       </section>
@@ -167,13 +188,10 @@
       <!-- History chart -->
       <section class="history-section">
         <h2 class="section-title">7-Day History</h2>
-        <div class="chart-wrap" id="historyChart">
-          <!-- Rendered by JS -->
-        </div>
+        <div class="chart-wrap" id="historyChart"></div>
       </section>
 
-      <!-- Bottom padding for nav -->
-      <div style="height:24px"></div>
+      <div style="height:32px"></div>
     </div>
 
     <!-- ── SCREEN: Profile editor ── -->
@@ -183,7 +201,6 @@
         <span class="top-bar-name">Edit Profile</span>
         <button class="btn btn-primary small" id="btnSaveProfile">Save</button>
       </header>
-
       <div class="profile-form">
         <div class="field-group">
           <label>Name</label>
@@ -215,18 +232,32 @@
             <input type="number" id="profProteinTarget" />
           </div>
           <div class="field-group">
-            <label>Calorie Target</label>
+            <label>Calorie Target (kcal)</label>
             <input type="number" id="profCalTarget" />
           </div>
         </div>
 
-        <div class="section-title" style="margin-top:28px">Herbalife Products</div>
-        <p class="helper-text">Add your personal Herbalife products for quick logging</p>
+        <!-- Herbalife product library (upgraded) -->
+        <div class="section-title" style="margin-top:28px">🟠 Herbalife Library</div>
+        <p class="helper-text">Your personal Herbalife products — add once, log anywhere</p>
         <div id="herbaList"></div>
-        <div class="herba-add-row">
-          <input type="text" id="herbaName" placeholder="Product name" />
-          <input type="number" id="herbaProtein" placeholder="g protein" min="0" max="100" />
-          <button class="btn btn-primary small" id="btnAddHerba">Add</button>
+
+        <div class="herba-add-card">
+          <div class="field-group">
+            <label>Product Name</label>
+            <input type="text" id="herbaName" placeholder="e.g. Formula 1 Shake" />
+          </div>
+          <div class="field-row">
+            <div class="field-group">
+              <label>Protein (g)</label>
+              <input type="number" id="herbaProtein" placeholder="17" min="0" max="200" />
+            </div>
+            <div class="field-group">
+              <label>Calories (kcal)</label>
+              <input type="number" id="herbaKcal" placeholder="220" min="0" max="1000" />
+            </div>
+          </div>
+          <button class="btn btn-primary" id="btnAddHerba" style="width:100%;margin-top:6px">+ Add Product</button>
         </div>
 
         <div class="danger-zone">
@@ -238,7 +269,7 @@
   </div><!-- /#app -->
 
   <!-- ══════════════════════════════════
-       ADD FOOD MODAL (shared)
+       ADD FOOD MODAL
        ══════════════════════════════════ -->
   <div id="foodModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-sheet">
@@ -248,7 +279,6 @@
         <button class="icon-btn" id="btnCloseModal">✕</button>
       </div>
 
-      <!-- Tabs: Library / Manual / Herbalife -->
       <div class="modal-tabs">
         <button class="mtab active" data-tab="library">Library</button>
         <button class="mtab" data-tab="manual">Manual</button>
@@ -258,39 +288,81 @@
       <!-- Library tab -->
       <div class="modal-tab-pane active" id="tabLibrary">
         <input type="search" id="foodSearch" placeholder="Search foods…" class="search-bar" />
-        <div class="food-grid" id="foodGrid">
-          <!-- Rendered by JS -->
-        </div>
+        <div class="food-grid" id="foodGrid"></div>
       </div>
 
-      <!-- Manual tab -->
+      <!-- Manual entry tab (improved) -->
       <div class="modal-tab-pane hidden" id="tabManual">
-        <div class="field-group">
-          <label>Food name</label>
-          <input type="text" id="manualFoodName" placeholder="e.g. Protein bar" />
+        <div class="manual-form">
+          <div class="field-group">
+            <label>Food / Meal Name <span class="req">*</span></label>
+            <input type="text" id="manualFoodName"
+              placeholder="e.g. Chicken wrap"
+              autocomplete="off"
+              maxlength="80" />
+          </div>
+          <div class="field-row">
+            <div class="field-group">
+              <label>Protein (g) <span class="req">*</span></label>
+              <input type="number" id="manualFoodProtein"
+                placeholder="32"
+                min="0" max="300" step="0.5"
+                inputmode="decimal" />
+            </div>
+            <div class="field-group">
+              <label>Calories (kcal)</label>
+              <input type="number" id="manualFoodCal"
+                placeholder="420"
+                min="0" max="3000"
+                inputmode="numeric" />
+              <span class="field-hint">Optional</span>
+            </div>
+          </div>
+          <!-- Live preview card -->
+          <div class="manual-preview" id="manualPreview"></div>
+          <!-- Validation error -->
+          <div class="validation-msg hidden" id="manualValidation"></div>
+          <button class="btn btn-primary" id="btnAddManual" style="width:100%;margin-top:4px">
+            ✓ Add to Meal
+          </button>
         </div>
-        <div class="field-group">
-          <label>Protein (grams)</label>
-          <input type="number" id="manualFoodProtein" placeholder="0" min="0" max="200" step="0.5" />
-        </div>
-        <div class="field-group">
-          <label>Calories (optional)</label>
-          <input type="number" id="manualFoodCal" placeholder="0" min="0" max="2000" />
-        </div>
-        <button class="btn btn-primary" id="btnAddManual">Add to Meal</button>
       </div>
 
       <!-- Herbalife tab -->
       <div class="modal-tab-pane hidden" id="tabHerba">
-        <div class="food-grid" id="herbaGrid">
-          <!-- Rendered by JS -->
-        </div>
-        <p class="helper-text" id="herbaModalHint">Add Herbalife products in Profile → Herbalife Products</p>
+        <p class="helper-text" style="margin-bottom:10px">Tap a product to log it instantly</p>
+        <div class="food-grid" id="herbaGrid"></div>
+        <p class="helper-text hidden" id="herbaModalHint">
+          No products added yet — go to ⚙ Profile → Herbalife Library.
+        </p>
       </div>
     </div>
   </div>
 
-  <!-- Toast notification -->
+  <!-- ══════════════════════════════════
+       AUTO PLAN MODAL
+       ══════════════════════════════════ -->
+  <div id="planModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
+    <div class="modal-sheet modal-sheet-tall">
+      <div class="modal-handle"></div>
+      <div class="modal-header">
+        <h3>🤖 Daily Meal Plan</h3>
+        <button class="icon-btn" id="btnClosePlanModal">✕</button>
+      </div>
+      <p class="plan-modal-sub" id="planModalSub"></p>
+
+      <!-- Plan meal cards populated by JS -->
+      <div id="planCards"></div>
+
+      <div class="plan-actions">
+        <button class="btn btn-ghost" id="btnRegeneratePlan">🔄 New Plan</button>
+        <button class="btn btn-primary" id="btnAcceptPlan">✓ Log All Meals</button>
+      </div>
+      <p class="plan-footer-note">This will add all suggested meals to today's log</p>
+    </div>
+  </div>
+
+  <!-- Toast -->
   <div id="toast" class="toast hidden"></div>
 
   <script src="app.js"></script>
