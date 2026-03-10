@@ -707,3 +707,121 @@ input::placeholder { color: var(--text3); }
 
   .summary-grid { grid-template-columns: 1fr 1fr 1fr; }
 }
+
+/* ═══════════════════════════════════════════════
+   PIN OVERLAY & KEYPAD (v3)
+   ═══════════════════════════════════════════════ */
+.pin-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.80);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+
+.pin-card {
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 32px 24px;
+  width: 100%; max-width: 320px;
+  display: flex; flex-direction: column; align-items: center; gap: 16px;
+  box-shadow: var(--shadow);
+}
+
+.pin-avatar {
+  width: 60px; height: 60px; border-radius: 50%;
+  background: var(--green-dim); color: var(--green-light);
+  font-family: var(--font-display); font-size: 26px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+}
+
+.pin-name { font-size: 18px; font-weight: 600; color: var(--cream); }
+
+.pin-label { font-size: 13px; color: var(--text2); }
+
+.pin-dots {
+  display: flex; gap: 14px; align-items: center;
+}
+
+.pin-dot {
+  width: 16px; height: 16px; border-radius: 50%;
+  border: 2px solid var(--border);
+  background: transparent;
+  transition: background .15s, border-color .15s;
+}
+
+.pin-dot.filled {
+  background: var(--green);
+  border-color: var(--green);
+}
+
+.pin-error {
+  font-size: 12px; color: var(--danger);
+  background: rgba(217,92,92,0.1);
+  border: 1px solid rgba(217,92,92,0.3);
+  border-radius: 6px; padding: 6px 14px;
+}
+
+.pin-pad {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+  width: 100%;
+}
+
+.pin-key {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); color: var(--cream);
+  font-family: var(--font-display); font-size: 22px; font-weight: 700;
+  padding: 16px 0; text-align: center;
+  transition: background .15s, transform .1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.pin-key:active { background: var(--green-dim); transform: scale(0.94); }
+
+.pin-key-cancel { font-size: 16px; color: var(--text3); }
+.pin-key-cancel:active { color: var(--danger); }
+.pin-key-del { font-size: 18px; }
+
+/* ═══════════════════════════════════════════════
+   SUGGESTION HEADER — refresh button (v3)
+   ═══════════════════════════════════════════════ */
+.suggestion-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 8px;
+}
+/* suggestion-label is already defined, but no text-content-based rules */
+.sug-refresh-btn {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--green); font-size: 16px;
+  padding: 4px 10px; line-height: 1; cursor: pointer;
+  transition: background .15s, transform .2s;
+  -webkit-tap-highlight-color: transparent;
+}
+.sug-refresh-btn:hover { background: var(--green-dim); }
+.sug-refresh-btn:active { transform: rotate(180deg); }
+
+/* ═══════════════════════════════════════════════
+   PLAN CARDS — per-meal log button (v3)
+   ═══════════════════════════════════════════════ */
+.plan-intro-note {
+  font-size: 12px; color: var(--text2); text-align: center;
+  margin-bottom: 14px; line-height: 1.5;
+}
+
+.plan-log-btn {
+  width: 100%; margin-top: 10px;
+  background: var(--green-dim); border: 1px solid var(--green);
+  border-radius: var(--radius-sm); color: var(--green-light);
+  font-size: 13px; font-weight: 600; font-family: var(--font-body);
+  padding: 9px; cursor: pointer;
+  transition: background .15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.plan-log-btn:hover { background: #3a7040; }
+.plan-log-btn:disabled { opacity: 0.5; cursor: default; }
+
+.plan-card-logged {
+  opacity: 0.7;
+  border-color: var(--green-dim) !important;
+}
+.plan-card-logged .plan-log-btn {
+  background: var(--bg3); color: var(--green); border-color: var(--green-dim);
+}
