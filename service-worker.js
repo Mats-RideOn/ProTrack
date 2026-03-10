@@ -5,7 +5,7 @@
    ═══════════════════════════════════════════════════ */
 
 // ── Cache version. Bump this whenever you update files! ──
-const CACHE_NAME = 'protrack-v1';
+const CACHE_NAME = 'protrack-v2';
 
 // ── Files to cache for offline use ──
 const ASSETS_TO_CACHE = [
