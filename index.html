@@ -8,7 +8,6 @@
   <meta name="apple-mobile-web-app-title" content="ProTrack" />
   <meta name="theme-color" content="#1a2e1a" />
   <title>ProTrack — Protein Tracker</title>
-
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icons/icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -28,6 +27,8 @@
       </div>
       <div class="account-list" id="accountList"></div>
       <button class="btn btn-primary" id="btnNewAccount">+ Create New Profile</button>
+
+      <!-- New account form -->
       <div class="new-account-form hidden" id="newAccountForm">
         <h3>Create Your Profile</h3>
         <div class="field-group">
@@ -64,9 +65,46 @@
             <input type="number" id="newCalTarget" placeholder="2000" min="500" max="6000" />
           </div>
         </div>
+        <div class="field-group">
+          <label>PIN (4 digits) &#128274;</label>
+          <input type="password" id="newPin" placeholder="e.g. 1234"
+            maxlength="4" inputmode="numeric" pattern="[0-9]*"
+            autocomplete="new-password" />
+          <span class="field-hint">Keeps your data private on shared devices. Optional — leave blank for no PIN.</span>
+        </div>
         <div class="form-actions">
           <button class="btn btn-ghost" id="btnCancelNew">Cancel</button>
           <button class="btn btn-primary" id="btnSaveNew">Create Profile</button>
+        </div>
+      </div>
+
+      <!-- PIN entry overlay (shown when tapping a PIN-protected profile) -->
+      <div class="pin-overlay hidden" id="pinOverlay">
+        <div class="pin-card">
+          <div class="pin-avatar" id="pinAvatar"></div>
+          <div class="pin-name" id="pinName"></div>
+          <p class="pin-label">Enter your PIN</p>
+          <div class="pin-dots" id="pinDots">
+            <span class="pin-dot"></span>
+            <span class="pin-dot"></span>
+            <span class="pin-dot"></span>
+            <span class="pin-dot"></span>
+          </div>
+          <div class="pin-error hidden" id="pinError">Incorrect PIN — try again</div>
+          <div class="pin-pad">
+            <button class="pin-key" data-val="1">1</button>
+            <button class="pin-key" data-val="2">2</button>
+            <button class="pin-key" data-val="3">3</button>
+            <button class="pin-key" data-val="4">4</button>
+            <button class="pin-key" data-val="5">5</button>
+            <button class="pin-key" data-val="6">6</button>
+            <button class="pin-key" data-val="7">7</button>
+            <button class="pin-key" data-val="8">8</button>
+            <button class="pin-key" data-val="9">9</button>
+            <button class="pin-key pin-key-cancel" id="btnPinCancel">&#10005;</button>
+            <button class="pin-key" data-val="0">0</button>
+            <button class="pin-key pin-key-del" id="btnPinDel">&#9003;</button>
+          </div>
         </div>
       </div>
     </div>
@@ -74,33 +112,28 @@
     <!-- ── SCREEN: Main Dashboard ── -->
     <div id="screen-dash" class="screen hidden">
 
-      <!-- Top bar -->
       <header class="top-bar">
         <div class="top-bar-left">
           <button class="avatar-btn" id="avatarBtn" title="Switch profile"></button>
           <div class="top-bar-info">
-            <span class="top-bar-name" id="topBarName">Loading…</span>
+            <span class="top-bar-name" id="topBarName">Loading...</span>
             <span class="top-bar-date" id="topBarDate"></span>
           </div>
         </div>
         <div class="top-bar-right">
-          <button class="icon-btn" id="btnOpenProfile" title="Profile">⚙</button>
+          <button class="icon-btn" id="btnOpenProfile" title="Profile">&#9881;</button>
         </div>
       </header>
 
-      <!-- Apple Health kcal strip -->
       <div class="health-strip">
-        <span class="health-icon">🍎</span>
+        <span class="health-icon">&#127822;</span>
         <span class="health-label">Apple Health calories today</span>
         <input type="number" id="healthKcal" class="health-input" placeholder="0" min="0" max="9999" />
         <span class="health-unit">kcal</span>
       </div>
 
-      <!-- Progress hero: dual rings (protein + calories) -->
       <section class="progress-hero">
         <div class="hero-rings">
-
-          <!-- Protein ring (primary) -->
           <div class="ring-block">
             <div class="progress-ring-wrap">
               <svg class="ring-svg" viewBox="0 0 120 120">
@@ -115,8 +148,6 @@
             </div>
             <div class="ring-block-label">Protein</div>
           </div>
-
-          <!-- Calories ring (secondary) -->
           <div class="ring-block">
             <div class="progress-ring-wrap progress-ring-wrap-sm">
               <svg class="ring-svg" viewBox="0 0 120 120">
@@ -131,7 +162,6 @@
             </div>
             <div class="ring-block-label">Calories</div>
           </div>
-
         </div>
 
         <div class="progress-stats">
@@ -162,30 +192,26 @@
         <p class="dynamic-message" id="dynamicMsg"></p>
       </section>
 
-      <!-- Auto Plan section -->
       <section class="auto-plan-section">
         <button class="btn btn-plan" id="btnAutoPlan">
-          <span>🤖</span>
+          <span>&#129302;</span>
           <span>Auto Plan My Day</span>
         </button>
-        <p class="plan-hint">Instantly generate a full meal plan to hit your protein goal</p>
+        <p class="plan-hint">Generate a full meal plan — then log each meal when you eat it</p>
       </section>
 
-      <!-- Meal slots -->
       <section class="meals-section">
         <h2 class="section-title">Today's Meals</h2>
         <div id="mealSlots"></div>
       </section>
 
-      <!-- Daily summary card -->
       <section class="summary-card" id="summaryCard">
         <h2 class="section-title">Daily Summary</h2>
         <div class="summary-grid" id="summaryGrid"></div>
         <div class="summary-msg" id="summaryMsg"></div>
-        <button class="btn btn-ghost small" id="btnResetDay">🔄 Reset Today's Log</button>
+        <button class="btn btn-ghost small" id="btnResetDay">&#128260; Reset Today's Log</button>
       </section>
 
-      <!-- History chart -->
       <section class="history-section">
         <h2 class="section-title">7-Day History</h2>
         <div class="chart-wrap" id="historyChart"></div>
@@ -197,7 +223,7 @@
     <!-- ── SCREEN: Profile editor ── -->
     <div id="screen-profile" class="screen hidden">
       <header class="top-bar">
-        <button class="icon-btn" id="btnBackFromProfile">← Back</button>
+        <button class="icon-btn" id="btnBackFromProfile">&#8592; Back</button>
         <span class="top-bar-name">Edit Profile</span>
         <button class="btn btn-primary small" id="btnSaveProfile">Save</button>
       </header>
@@ -223,7 +249,7 @@
           </div>
           <div class="field-group">
             <label>BMI</label>
-            <div class="bmi-badge" id="profBMI">—</div>
+            <div class="bmi-badge" id="profBMI">&#8212;</div>
           </div>
         </div>
         <div class="field-row">
@@ -236,12 +262,16 @@
             <input type="number" id="profCalTarget" />
           </div>
         </div>
+        <div class="field-group">
+          <label>Change PIN &#128274;</label>
+          <input type="password" id="profPin" placeholder="Leave blank to keep current"
+            maxlength="4" inputmode="numeric" autocomplete="new-password" />
+          <span class="field-hint">Set a new 4-digit PIN, or leave blank to keep existing</span>
+        </div>
 
-        <!-- Herbalife product library (upgraded) -->
-        <div class="section-title" style="margin-top:28px">🟠 Herbalife Library</div>
+        <div class="section-title" style="margin-top:28px">&#127809; Herbalife Library</div>
         <p class="helper-text">Your personal Herbalife products — add once, log anywhere</p>
         <div id="herbaList"></div>
-
         <div class="herba-add-card">
           <div class="field-group">
             <label>Product Name</label>
@@ -268,97 +298,72 @@
 
   </div><!-- /#app -->
 
-  <!-- ══════════════════════════════════
-       ADD FOOD MODAL
-       ══════════════════════════════════ -->
+  <!-- ADD FOOD MODAL -->
   <div id="foodModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-sheet">
       <div class="modal-handle"></div>
       <div class="modal-header">
         <h3 id="modalMealName">Add Food</h3>
-        <button class="icon-btn" id="btnCloseModal">✕</button>
+        <button class="icon-btn" id="btnCloseModal">&#10005;</button>
       </div>
-
       <div class="modal-tabs">
         <button class="mtab active" data-tab="library">Library</button>
         <button class="mtab" data-tab="manual">Manual</button>
         <button class="mtab" data-tab="herba">Herbalife</button>
       </div>
-
-      <!-- Library tab -->
       <div class="modal-tab-pane active" id="tabLibrary">
-        <input type="search" id="foodSearch" placeholder="Search foods…" class="search-bar" />
+        <input type="search" id="foodSearch" placeholder="Search foods..." class="search-bar" />
         <div class="food-grid" id="foodGrid"></div>
       </div>
-
-      <!-- Manual entry tab (improved) -->
       <div class="modal-tab-pane hidden" id="tabManual">
         <div class="manual-form">
           <div class="field-group">
             <label>Food / Meal Name <span class="req">*</span></label>
-            <input type="text" id="manualFoodName"
-              placeholder="e.g. Chicken wrap"
-              autocomplete="off"
-              maxlength="80" />
+            <input type="text" id="manualFoodName" placeholder="e.g. Chicken wrap" autocomplete="off" maxlength="80" />
           </div>
           <div class="field-row">
             <div class="field-group">
               <label>Protein (g) <span class="req">*</span></label>
-              <input type="number" id="manualFoodProtein"
-                placeholder="32"
-                min="0" max="300" step="0.5"
-                inputmode="decimal" />
+              <input type="number" id="manualFoodProtein" placeholder="32" min="0" max="300" step="0.5" inputmode="decimal" />
             </div>
             <div class="field-group">
               <label>Calories (kcal)</label>
-              <input type="number" id="manualFoodCal"
-                placeholder="420"
-                min="0" max="3000"
-                inputmode="numeric" />
+              <input type="number" id="manualFoodCal" placeholder="420" min="0" max="3000" inputmode="numeric" />
               <span class="field-hint">Optional</span>
             </div>
           </div>
-          <!-- Live preview card -->
           <div class="manual-preview" id="manualPreview"></div>
-          <!-- Validation error -->
           <div class="validation-msg hidden" id="manualValidation"></div>
-          <button class="btn btn-primary" id="btnAddManual" style="width:100%;margin-top:4px">
-            ✓ Add to Meal
-          </button>
+          <button class="btn btn-primary" id="btnAddManual" style="width:100%;margin-top:4px">&#10003; Add to Meal</button>
         </div>
       </div>
-
-      <!-- Herbalife tab -->
       <div class="modal-tab-pane hidden" id="tabHerba">
         <p class="helper-text" style="margin-bottom:10px">Tap a product to log it instantly</p>
         <div class="food-grid" id="herbaGrid"></div>
-        <p class="helper-text hidden" id="herbaModalHint">
-          No products added yet — go to ⚙ Profile → Herbalife Library.
-        </p>
+        <p class="helper-text hidden" id="herbaModalHint">No products added yet — go to &#9881; Profile &#8594; Herbalife Library.</p>
       </div>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════
-       AUTO PLAN MODAL
-       ══════════════════════════════════ -->
+  <!-- AUTO PLAN MODAL — per-meal log buttons, not bulk accept -->
   <div id="planModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
     <div class="modal-sheet modal-sheet-tall">
       <div class="modal-handle"></div>
       <div class="modal-header">
-        <h3>🤖 Daily Meal Plan</h3>
-        <button class="icon-btn" id="btnClosePlanModal">✕</button>
+        <h3>&#129302; Daily Meal Plan</h3>
+        <button class="icon-btn" id="btnClosePlanModal">&#10005;</button>
       </div>
       <p class="plan-modal-sub" id="planModalSub"></p>
+      <p class="plan-intro-note">Tap <strong>Log</strong> on each meal when you've eaten it. Change your mind? Generate a new plan.</p>
 
-      <!-- Plan meal cards populated by JS -->
+      <!-- Plan meal cards — each has its own Log button -->
       <div id="planCards"></div>
 
       <div class="plan-actions">
-        <button class="btn btn-ghost" id="btnRegeneratePlan">🔄 New Plan</button>
-        <button class="btn btn-primary" id="btnAcceptPlan">✓ Log All Meals</button>
+        <button class="btn btn-ghost" id="btnRegeneratePlan">&#128260; New Plan</button>
+        <button class="btn btn-primary" id="btnLogAllPlan">&#10003; Log All</button>
       </div>
-      <p class="plan-footer-note">This will add all suggested meals to today's log</p>
+      <p class="plan-footer-note">Log All adds every meal at once — or log them individually above</p>
     </div>
   </div>
 
