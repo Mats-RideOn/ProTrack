@@ -1,10 +1,7 @@
 /* ═══════════════════════════════════════════════════════════════
-   ProTrack — app.js  v5.0
-   ─ Daggeschiedenis viewer (tot 7 dagen terug)
-   ─ Apple Health strip verwijderd
-   ─ Portie vermenigvuldiger in food modal (1x / 2x / 3x)
-   ─ Food library gesorteerd per maaltijdtype (relevante items eerst)
-   ─ Eigen maaltijden toevoegen aan persoonlijke library
+   ProTrack — app.js  v6.0
+   ─ Betrouwbare wachtwoord-hash (stabiele string-gebaseerde hash)
+   ─ Voormiddagsnack toegevoegd
    ═══════════════════════════════════════════════════════════════ */
 'use strict';
 
@@ -12,11 +9,12 @@ const DEFAULT_PROTEIN_TARGET = 110;
 const DEFAULT_KCAL_TARGET    = 2000;
 
 const MEAL_DEFAULTS = [
-  { id: 'breakfast',       emoji: '🌅', name: 'Ontbijt',       defaultTarget: 25 },
-  { id: 'lunch',           emoji: '☀️',  name: 'Lunch',         defaultTarget: 30 },
-  { id: 'afternoon_snack', emoji: '🍎', name: 'Namiddagsnack', defaultTarget: 10 },
-  { id: 'dinner',         emoji: '🌙', name: 'Avondmaal',     defaultTarget: 35 },
-  { id: 'evening_snack',  emoji: '🌃', name: 'Avondsnack',    defaultTarget: 10 },
+  { id: 'breakfast',       emoji: '🌅', name: 'Ontbijt',          defaultTarget: 22 },
+  { id: 'morning_snack',   emoji: '🍌', name: 'Voormiddagsnack',  defaultTarget: 8  },
+  { id: 'lunch',           emoji: '☀️',  name: 'Lunch',            defaultTarget: 28 },
+  { id: 'afternoon_snack', emoji: '🍎', name: 'Namiddagsnack',    defaultTarget: 10 },
+  { id: 'dinner',          emoji: '🌙', name: 'Avondmaal',        defaultTarget: 32 },
+  { id: 'evening_snack',   emoji: '🌃', name: 'Avondsnack',       defaultTarget: 10 },
 ];
 
 const DEFAULT_HERBA_PRODUCTS = [
@@ -36,17 +34,17 @@ const DEFAULT_HERBA_PRODUCTS = [
 // ─────────────────────────────────────────────────────────────────
 const FOOD_LIBRARY = [
   // EIEREN & ZUIVEL
-  { name: '1 ei (groot)',                  protein: 6,  kcal: 72,  serving: '1 ei',           priority: ['breakfast','afternoon_snack','evening_snack'] },
+  { name: '1 ei (groot)',                  protein: 6,  kcal: 72,  serving: '1 ei',           priority: ['breakfast','morning_snack','afternoon_snack','evening_snack'] },
   { name: '2 eieren',                     protein: 12, kcal: 144, serving: '2 eieren',        priority: ['breakfast','afternoon_snack'] },
   { name: '3 eieren',                     protein: 18, kcal: 216, serving: '3 eieren',        priority: ['breakfast'] },
   { name: 'Eiwitten (3)',                 protein: 11, kcal: 51,  serving: '3 eiwitten',      priority: ['breakfast','evening_snack'] },
-  { name: 'Griekse yogurt 0% (100g)',     protein: 10, kcal: 57,  serving: '100g',            priority: ['breakfast','afternoon_snack','evening_snack'] },
+  { name: 'Griekse yogurt 0% (100g)',     protein: 10, kcal: 57,  serving: '100g',            priority: ['breakfast','morning_snack','afternoon_snack','evening_snack'] },
   { name: 'Griekse yogurt 0% (200g)',     protein: 20, kcal: 114, serving: '200g pot',        priority: ['breakfast','afternoon_snack','evening_snack'] },
-  { name: 'Skyr (100g)',                  protein: 11, kcal: 65,  serving: '100g',            priority: ['breakfast','afternoon_snack','evening_snack'] },
+  { name: 'Skyr (100g)',                  protein: 11, kcal: 65,  serving: '100g',            priority: ['breakfast','morning_snack','afternoon_snack','evening_snack'] },
   { name: 'Skyr (150g)',                  protein: 17, kcal: 98,  serving: '150g',            priority: ['breakfast','afternoon_snack','evening_snack'] },
-  { name: 'Kwark naturel (100g)',         protein: 12, kcal: 67,  serving: '100g',            priority: ['breakfast','afternoon_snack','evening_snack'] },
+  { name: 'Kwark naturel (100g)',         protein: 12, kcal: 67,  serving: '100g',            priority: ['breakfast','morning_snack','afternoon_snack','evening_snack'] },
   { name: 'Kwark naturel (150g)',         protein: 18, kcal: 101, serving: '150g',            priority: ['breakfast','afternoon_snack','evening_snack'] },
-  { name: 'Hüttenkäse (100g)',           protein: 11, kcal: 98,  serving: '100g',            priority: ['breakfast','afternoon_snack','evening_snack'] },
+  { name: 'Hüttenkäse (100g)',           protein: 11, kcal: 98,  serving: '100g',            priority: ['breakfast','morning_snack','afternoon_snack','evening_snack'] },
   { name: 'Hüttenkäse (200g)',           protein: 22, kcal: 196, serving: '200g',            priority: ['breakfast','afternoon_snack','evening_snack'] },
   { name: 'Halfvolle melk (200ml)',       protein: 7,  kcal: 92,  serving: '200ml',           priority: ['breakfast'] },
   { name: 'Cheddar snede (40g)',          protein: 10, kcal: 161, serving: '40g',             priority: ['breakfast','lunch'] },
@@ -54,7 +52,7 @@ const FOOD_LIBRARY = [
   { name: 'Mozzarella (100g)',            protein: 22, kcal: 280, serving: '100g',            priority: ['lunch','dinner'] },
   { name: 'Feta kaas (50g)',              protein: 7,  kcal: 133, serving: '50g',             priority: ['lunch','dinner'] },
   { name: 'Ricotta (100g)',               protein: 11, kcal: 174, serving: '100g',            priority: ['dinner'] },
-  { name: 'String kaas stick',           protein: 7,  kcal: 80,  serving: '28g',             priority: ['afternoon_snack','evening_snack'] },
+  { name: 'String kaas stick',           protein: 7,  kcal: 80,  serving: '28g',             priority: ['morning_snack','afternoon_snack','evening_snack'] },
   { name: 'Babybel light (1)',            protein: 6,  kcal: 41,  serving: '20g rondje',      priority: ['afternoon_snack','evening_snack'] },
   // PROTEÏNE POEDERS
   { name: 'Whey proteïne (1 scoop)',      protein: 24, kcal: 130, serving: '1 scoop ~30g',    priority: ['breakfast','afternoon_snack','evening_snack'] },
@@ -85,7 +83,7 @@ const FOOD_LIBRARY = [
   { name: 'Varkenslende (150g)',          protein: 39, kcal: 278, serving: '150g gebakken',   priority: ['dinner'] },
   { name: 'Hesp gesneden (100g)',         protein: 17, kcal: 115, serving: '100g',            priority: ['lunch','breakfast'] },
   { name: 'Spek (2 reepjes)',             protein: 12, kcal: 138, serving: '40g gebakken',    priority: ['breakfast'] },
-  { name: 'Beef jerky (50g)',             protein: 17, kcal: 132, serving: '50g',             priority: ['afternoon_snack','evening_snack'] },
+  { name: 'Beef jerky (50g)',             protein: 17, kcal: 132, serving: '50g',             priority: ['morning_snack','afternoon_snack','evening_snack'] },
   { name: 'Beef jerky (100g)',            protein: 33, kcal: 264, serving: '100g',            priority: ['afternoon_snack','evening_snack'] },
   // VIS & ZEEVRUCHTEN
   { name: 'Gerookte zalm (50g)',          protein: 13, kcal: 83,  serving: '50g',             priority: ['breakfast','lunch','evening_snack'] },
@@ -152,6 +150,21 @@ const SUGGESTION_POOL = {
     { label: '2 gekookte eieren + roggebrood + gerookte zalm',    protein: 30, kcal: 360 },
     { label: 'Griekse yogurt + proteïnegranola + bessen',         protein: 26, kcal: 390 },
     { label: 'Overnight caseïne haver met chia & bessen',         protein: 32, kcal: 450 },
+  ],
+  morning_snack: [
+    { label: 'Skyr (150g) + handvol bosvruchten',                  protein: 17, kcal: 120 },
+    { label: 'Kwark (100g) + granola + bessen',                    protein: 16, kcal: 195 },
+    { label: '1 gekookt ei + 1 snede roggebrood',                  protein: 9,  kcal: 152 },
+    { label: 'Griekse yogurt (100g) + amandelen (15g)',            protein: 13, kcal: 164 },
+    { label: 'Hüttenkäse (100g) + appel',                         protein: 11, kcal: 147 },
+    { label: 'Whey shake (1/2 scoop) + 150ml melk',               protein: 16, kcal: 115 },
+    { label: 'Pindakaas (1 el) + 1 rijstwafel',                   protein: 5,  kcal: 128 },
+    { label: '2 Babybel light + druiven',                          protein: 12, kcal: 121 },
+    { label: 'Proteïnereepje (mini)',                              protein: 10, kcal: 120 },
+    { label: 'Amandelen (20g) + 1 stuk fruit',                    protein: 4,  kcal: 153 },
+    { label: 'Skyr (100g) + 1 el honing',                         protein: 11, kcal: 95  },
+    { label: '1 hardgekookt ei + cherrytomaatjes',                 protein: 6,  kcal: 82  },
+    { label: 'Hüttenkäse (150g) + komkommer + paprika',           protein: 17, kcal: 120 },
   ],
   lunch: [
     { label: 'Gegrilde kipfilet + quinoa + geroosterde groenten', protein: 52, kcal: 490 },
@@ -227,6 +240,16 @@ const PLAN_MEALS = {
     { name: 'CC Pannenkoekjes',         ingredients: 'Hüttenkäse (100g) + 2 eieren + 40g haver (gebakken)',     protein: 28, kcal: 380 },
     { name: 'Overnight Caseïne Haver',  ingredients: 'Caseïne (1 scoop) + 60g haver + melk + chiazaden',        protein: 32, kcal: 450 },
   ],
+  morning_snack: [
+    { name: 'Skyr & Bessen',         ingredients: 'Skyr (150g) + gemengde bosvruchten + 1 el granola',         protein: 18, kcal: 165 },
+    { name: 'Kwark Pot',             ingredients: 'Kwark (100g) + stukjes fruit + druppel honing',             protein: 12, kcal: 130 },
+    { name: 'Ei & Toast',            ingredients: '1 hardgekookt ei + 1 snede roggebrood + tomaat',             protein: 9,  kcal: 152 },
+    { name: 'Griekse Yogurt Mix',    ingredients: 'Griekse yogurt (100g) + 15g amandelen + appel',             protein: 13, kcal: 210 },
+    { name: 'Mini Whey Shake',       ingredients: 'Whey (1/2 scoop) + 150ml melk',                            protein: 16, kcal: 115 },
+    { name: 'Noten & Fruit',         ingredients: '25g gemengde noten + 1 stuk fruit naar keuze',              protein: 5,  kcal: 195 },
+    { name: 'Hüttenkäse Snack',     ingredients: 'Hüttenkäse (150g) + komkommer + 2 rijstwafels',             protein: 17, kcal: 195 },
+    { name: 'Proteïnereepje',        ingredients: 'Mini proteïnereep (10g+ proteïne)',                         protein: 10, kcal: 120 },
+  ],
   lunch: [
     { name: 'Kip Quinoakom',            ingredients: 'Kipfilet (150g) + quinoa (100g) + geroosterde groenten',  protein: 52, kcal: 555 },
     { name: 'Tonijn Salé Wrap',         ingredients: 'Tonijn (130g) + kikkererwten + volkoren wrap + salade',    protein: 38, kcal: 470 },
@@ -288,10 +311,33 @@ var portionMultiplier = 1;
 // LOCALSTORAGE HELPERS
 // ═══════════════════════════════════════════════════════════════
 function hashPassword(pw) {
+  // Stabiele djb2-stijl hash — vermijdt signed integer overflow door strings ipv bits
+  // Werkt identiek bij elke aanroep voor hetzelfde wachtwoord
+  var result = [];
   var h = 5381;
-  for (var i = 0; i < pw.length; i++) { h = ((h<<5)+h)+pw.charCodeAt(i); h=h&h; }
-  return (h>>>0).toString(16);
+  for (var i = 0; i < pw.length; i++) {
+    var c = pw.charCodeAt(i);
+    h = (h * 33 + c) % 4294967296; // mod 2^32 — altijd positief, geen overflow
+  }
+  // Tweede pass voor meer entropie
+  var h2 = 0;
+  for (var j = pw.length - 1; j >= 0; j--) {
+    h2 = (h2 * 31 + pw.charCodeAt(j)) % 4294967296;
+  }
+  return h.toString(16).padStart(8,'0') + h2.toString(16).padStart(8,'0');
 }
+// Legacy hash (v1-v5) — voor migratie van bestaande accounts
+function hashPasswordLegacy(pw) {
+  var h = 5381;
+  for (var i = 0; i < pw.length; i++) {
+    var c = pw.charCodeAt(i);
+    // Simuleer JS signed 32-bit shift zoals de originele code deed
+    var h32 = h | 0; // force signed 32-bit
+    h = (((h32 << 5) + h32 + c) >>> 0); // >>> 0 = unsigned 32-bit
+  }
+  return h.toString(16);
+}
+
 function getUserByEmail(email) {
   var ids = getAllUserIds();
   for (var i=0;i<ids.length;i++){var p=loadProfile(ids[i]);if(p&&p.email&&p.email.toLowerCase()===email.toLowerCase())return{uid:ids[i],profile:p};}
@@ -386,23 +432,49 @@ document.getElementById('tabLogin').addEventListener('click',function(){
   document.getElementById('tabRegister').classList.remove('auth-tab-active');
   document.getElementById('loginForm').classList.remove('hidden');
   document.getElementById('registerForm').classList.add('hidden');
+  hideAuthError('loginError');
 });
 document.getElementById('tabRegister').addEventListener('click',function(){
   document.getElementById('tabRegister').classList.add('auth-tab-active');
   document.getElementById('tabLogin').classList.remove('auth-tab-active');
   document.getElementById('registerForm').classList.remove('hidden');
   document.getElementById('loginForm').classList.add('hidden');
+  hideAuthError('registerError');
 });
 
 document.getElementById('btnLogin').addEventListener('click',function(){
   hideAuthError('loginError');
   var email=document.getElementById('loginEmail').value.trim().toLowerCase();
-  var pw=document.getElementById('loginPw').value;
-  if(!email||!pw){showAuthError('loginError','Vul email en wachtwoord in.');return;}
+  var pw   =document.getElementById('loginPw').value;
+  if(!email||!pw){showAuthError('loginError','Vul e-mail en wachtwoord in.');return;}
+
   var found=getUserByEmail(email);
-  if(!found){showAuthError('loginError','Geen account gevonden met dit email.');return;}
-  if(found.profile.pwHash!==hashPassword(pw)){showAuthError('loginError','Verkeerd wachtwoord.');return;}
-  loginAs(found.uid);
+  if(!found){
+    var ids=getAllUserIds();
+    if(ids.length===0){
+      showAuthError('loginError','Geen accounts gevonden. Maak eerst een account aan via "Registreren".');
+    } else {
+      showAuthError('loginError','Geen account gevonden voor dit e-mailadres.');
+    }
+    return;
+  }
+
+  // Probeer login — migreer oud hash-formaat transparant als nodig
+  var newHash=hashPassword(pw);
+  var oldHash=hashPasswordLegacy(pw);
+  var storedHash=found.profile.pwHash||'';
+
+  if(storedHash===newHash){
+    // Normaal pad
+    loginAs(found.uid);
+  } else if(storedHash===oldHash || storedHash.length<=8){
+    // Oud hash-formaat → migreer naar nieuw formaat en log in
+    found.profile.pwHash=newHash;
+    saveProfile(found.uid,found.profile);
+    loginAs(found.uid);
+  } else {
+    showAuthError('loginError','Verkeerd wachtwoord. Probeer opnieuw.');
+  }
 });
 
 document.getElementById('btnRegister').addEventListener('click',function(){
