@@ -1024,3 +1024,182 @@ input::placeholder { color: var(--text3); }
 }
 .sug-refresh-btn:hover  { background: var(--green-dim); }
 .sug-refresh-btn:active { transform: rotate(180deg); }
+
+/* ═══════════════════════════════════════════════
+   DATUM NAVIGATIE (v5)
+   ═══════════════════════════════════════════════ */
+.date-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px; height: 26px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--cream);
+  font-size: 13px;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+  transition: background .15s;
+}
+.date-nav-btn:hover { background: var(--green-dim); color: var(--green-light); }
+
+/* Actieve dag in de history chart */
+.chart-col-active .chart-bar {
+  outline: 2px solid var(--green-light);
+  outline-offset: 2px;
+}
+.chart-col-active .chart-day,
+.chart-col-active .chart-today-lbl {
+  color: var(--green-light);
+  font-weight: 700;
+}
+
+/* Read-only mode voor historische slots */
+.meal-slot.read-only { opacity: 0.85; }
+.meal-slot.read-only .meal-body {
+  background: rgba(255,255,255,0.02);
+}
+
+/* ═══════════════════════════════════════════════
+   PORTIE PICKER (v5)
+   ═══════════════════════════════════════════════ */
+.portion-picker {
+  border-top: 1px solid var(--border);
+  background: var(--bg3);
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 0;
+  animation: slideUp .2s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.portion-picker-inner {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+.portion-food-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cream);
+  text-align: center;
+  max-width: 260px;
+  line-height: 1.3;
+}
+.portion-controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.portion-btn {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 1.5px solid var(--border);
+  color: var(--cream);
+  font-size: 22px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background .15s, transform .1s;
+  -webkit-tap-highlight-color: transparent;
+}
+.portion-btn:hover:not(:disabled) { background: var(--green-dim); border-color: var(--green); }
+.portion-btn:active:not(:disabled) { transform: scale(0.92); }
+.portion-btn:disabled { opacity: 0.3; cursor: default; }
+.portion-qty {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--green-light);
+  min-width: 52px;
+  text-align: center;
+}
+.portion-totals {
+  font-size: 13px;
+  color: var(--text2);
+  text-align: center;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 16px;
+}
+.portion-actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+}
+.portion-actions .btn { flex: 1; }
+
+/* ═══════════════════════════════════════════════
+   FOOD LIBRARY SECTIES (v5)
+   ═══════════════════════════════════════════════ */
+.food-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: var(--text3);
+  padding: 10px 4px 5px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.food-section-label:first-child { padding-top: 4px; }
+
+.food-chip-custom {
+  border-color: rgba(93,186,106,0.35) !important;
+  background: rgba(93,186,106,0.06) !important;
+}
+.custom-badge {
+  font-size: 9px;
+  font-weight: 700;
+  background: var(--green-dim);
+  color: var(--green-light);
+  border-radius: 4px;
+  padding: 1px 5px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  vertical-align: middle;
+  margin-left: 3px;
+}
+
+/* ═══════════════════════════════════════════════
+   OPSLAAN IN BIBLIOTHEEK (manual form) (v5)
+   ═══════════════════════════════════════════════ */
+.save-to-lib-row {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  margin-top: 6px;
+}
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--cream);
+}
+.checkbox-label input[type="checkbox"] {
+  width: 18px; height: 18px;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+
+/* item-qty badge in log */
+.item-qty {
+  font-size: 11px;
+  background: var(--green-dim);
+  color: var(--green-light);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-weight: 600;
+  vertical-align: middle;
+}
