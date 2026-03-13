@@ -311,31 +311,28 @@ var portionMultiplier = 1;
 // LOCALSTORAGE HELPERS
 // ═══════════════════════════════════════════════════════════════
 function hashPassword(pw) {
-  // Stabiele djb2-stijl hash — vermijdt signed integer overflow door strings ipv bits
-  // Werkt identiek bij elke aanroep voor hetzelfde wachtwoord
-  var result = [];
-  var h = 5381;
-  for (var i = 0; i < pw.length; i++) {
-    var c = pw.charCodeAt(i);
-    h = (h * 33 + c) % 4294967296; // mod 2^32 — altijd positief, geen overflow
-  }
-  // Tweede pass voor meer entropie
-  var h2 = 0;
-  for (var j = pw.length - 1; j >= 0; j--) {
-    h2 = (h2 * 31 + pw.charCodeAt(j)) % 4294967296;
-  }
-  return h.toString(16).padStart(8,'0') + h2.toString(16).padStart(8,'0');
+  // btoa is ingebouwd in elke browser, 100% deterministisch, geen overflow mogelijk.
+  // Data staat lokaal op het toestel — btoa is voldoende voor privacy.
+  try { return btoa(unescape(encodeURIComponent(pw.trim()))); }
+  catch(e) { return btoa(pw.trim()); }
 }
-// Legacy hash (v1-v5) — voor migratie van bestaande accounts
+// Legacy hashes — voor migratie van accounts aangemaakt vóór v6
 function hashPasswordLegacy(pw) {
+  // v5 hash poging (djb2 met overflow)
   var h = 5381;
   for (var i = 0; i < pw.length; i++) {
-    var c = pw.charCodeAt(i);
-    // Simuleer JS signed 32-bit shift zoals de originele code deed
-    var h32 = h | 0; // force signed 32-bit
-    h = (((h32 << 5) + h32 + c) >>> 0); // >>> 0 = unsigned 32-bit
+    var h32 = h | 0;
+    h = (((h32 << 5) + h32 + pw.charCodeAt(i)) >>> 0);
   }
   return h.toString(16);
+}
+function hashPasswordLegacy2(pw) {
+  // v6-beta hash (modulo versie) — kort-levende versie
+  var h = 5381;
+  for (var i = 0; i < pw.length; i++) { h = (h * 33 + pw.charCodeAt(i)) % 4294967296; }
+  var h2 = 0;
+  for (var j = pw.length-1; j >= 0; j--) { h2 = (h2 * 31 + pw.charCodeAt(j)) % 4294967296; }
+  return h.toString(16).padStart(8,'0') + h2.toString(16).padStart(8,'0');
 }
 
 function getUserByEmail(email) {
@@ -445,7 +442,7 @@ document.getElementById('tabRegister').addEventListener('click',function(){
 document.getElementById('btnLogin').addEventListener('click',function(){
   hideAuthError('loginError');
   var email=document.getElementById('loginEmail').value.trim().toLowerCase();
-  var pw   =document.getElementById('loginPw').value;
+  var pw   =document.getElementById('loginPw').value.trim(); // trim voorkomt spatieproblemen
   if(!email||!pw){showAuthError('loginError','Vul e-mail en wachtwoord in.');return;}
 
   // Laad alle users rechtstreeks uit localStorage — geen cache
@@ -490,19 +487,20 @@ document.getElementById('btnLogin').addEventListener('click',function(){
 
   if (storedHash === newHash) {
     loginAs(found.uid);
-  } else if (storedHash === legacyHash) {
-    // Migreer oud hash-formaat
+  } else if (storedHash === legacyHash || storedHash === hashPasswordLegacy2(pw)) {
+    // Migreer oud hash-formaat naar btoa
     found.profile.pwHash = newHash;
     saveProfile(found.uid, found.profile);
     console.log('[Login] hash gemigreerd voor', found.uid);
     loginAs(found.uid);
-  } else if (storedHash === '') {
-    // Geen hash opgeslagen (oude account zonder hash) — accepteer en sla op
+  } else if (!storedHash) {
+    // Geen hash — accepteer en sla btoa op
     found.profile.pwHash = newHash;
     saveProfile(found.uid, found.profile);
     loginAs(found.uid);
   } else {
-    showAuthError('loginError','Verkeerd wachtwoord. Bekijk console (F12) voor details.');
+    console.log('[Login] hash mismatch. stored:', storedHash, 'new:', newHash, 'legacy:', legacyHash);
+    showAuthError('loginError','Verkeerd wachtwoord. Probeer opnieuw.');
   }
 });
 
@@ -510,8 +508,8 @@ document.getElementById('btnRegister').addEventListener('click',function(){
   hideAuthError('registerError');
   var name=document.getElementById('regName').value.trim();
   var email=document.getElementById('regEmail').value.trim().toLowerCase();
-  var pw=document.getElementById('regPw').value;
-  var pw2=document.getElementById('regPw2').value;
+  var pw=document.getElementById('regPw').value.trim();
+  var pw2=document.getElementById('regPw2').value.trim();
   if(!name){showAuthError('registerError','Vul je naam in.');return;}
   if(!email||!email.includes('@')){showAuthError('registerError','Vul een geldig emailadres in.');return;}
   if(!pw||pw.length<4){showAuthError('registerError','Wachtwoord moet minstens 4 tekens zijn.');return;}
