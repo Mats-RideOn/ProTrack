@@ -448,32 +448,61 @@ document.getElementById('btnLogin').addEventListener('click',function(){
   var pw   =document.getElementById('loginPw').value;
   if(!email||!pw){showAuthError('loginError','Vul e-mail en wachtwoord in.');return;}
 
-  var found=getUserByEmail(email);
-  if(!found){
-    var ids=getAllUserIds();
-    if(ids.length===0){
+  // Laad alle users rechtstreeks uit localStorage — geen cache
+  var rawIds = localStorage.getItem('protrack_users');
+  var ids = rawIds ? JSON.parse(rawIds) : [];
+  console.log('[Login] protrack_users raw:', rawIds);
+  console.log('[Login] ids:', ids);
+
+  // Zoek account op e-mail
+  var found = null;
+  for (var i = 0; i < ids.length; i++) {
+    var rawP = localStorage.getItem('protrack_profile_' + ids[i]);
+    if (!rawP) { console.log('[Login] geen profiel voor uid:', ids[i]); continue; }
+    var p = JSON.parse(rawP);
+    console.log('[Login] check uid:', ids[i], 'email:', p.email, 'vs input:', email);
+    if (p.email && p.email.toLowerCase() === email) {
+      found = { uid: ids[i], profile: p };
+      break;
+    }
+  }
+
+  if (!found) {
+    var knownEmails = ids.map(function(id){
+      var raw=localStorage.getItem('protrack_profile_'+id);
+      return raw ? JSON.parse(raw).email : null;
+    }).filter(Boolean);
+    console.log('[Login] Bekende e-mails:', knownEmails);
+    if (ids.length === 0) {
       showAuthError('loginError','Geen accounts gevonden. Maak eerst een account aan via "Registreren".');
     } else {
-      showAuthError('loginError','Geen account gevonden voor dit e-mailadres.');
+      showAuthError('loginError','Geen account gevonden. Bekende e-mails in console (F12).');
     }
     return;
   }
 
-  // Probeer login — migreer oud hash-formaat transparant als nodig
-  var newHash=hashPassword(pw);
-  var oldHash=hashPasswordLegacy(pw);
-  var storedHash=found.profile.pwHash||'';
+  // Controleer wachtwoord — probeer nieuw én oud hash-formaat
+  var storedHash = found.profile.pwHash || '';
+  var newHash    = hashPassword(pw);
+  var legacyHash = hashPasswordLegacy(pw);
 
-  if(storedHash===newHash){
-    // Normaal pad
+  console.log('[Login] stored:', storedHash, 'new:', newHash, 'legacy:', legacyHash);
+
+  if (storedHash === newHash) {
     loginAs(found.uid);
-  } else if(storedHash===oldHash || storedHash.length<=8){
-    // Oud hash-formaat → migreer naar nieuw formaat en log in
-    found.profile.pwHash=newHash;
-    saveProfile(found.uid,found.profile);
+  } else if (storedHash === legacyHash) {
+    // Migreer oud hash-formaat
+    found.profile.pwHash = newHash;
+    saveProfile(found.uid, found.profile);
+    console.log('[Login] hash gemigreerd voor', found.uid);
+    loginAs(found.uid);
+  } else if (storedHash === '') {
+    // Geen hash opgeslagen (oude account zonder hash) — accepteer en sla op
+    found.profile.pwHash = newHash;
+    saveProfile(found.uid, found.profile);
     loginAs(found.uid);
   } else {
-    showAuthError('loginError','Verkeerd wachtwoord. Probeer opnieuw.');
+    showAuthError('loginError','Verkeerd wachtwoord. Bekijk console (F12) voor details.');
   }
 });
 
@@ -489,8 +518,23 @@ document.getElementById('btnRegister').addEventListener('click',function(){
   if(pw!==pw2){showAuthError('registerError','Wachtwoorden komen niet overeen.');return;}
   if(getUserByEmail(email)){showAuthError('registerError','Er bestaat al een account met dit emailadres.');return;}
   var uid=genId();
-  var profile={name:name,email:email,pwHash:hashPassword(pw),age:parseInt(document.getElementById('regAge').value)||null,weight:parseFloat(document.getElementById('regWeight').value)||null,height:parseFloat(document.getElementById('regHeight').value)||null,proteinTarget:parseInt(document.getElementById('regProtein').value)||DEFAULT_PROTEIN_TARGET,calTarget:parseInt(document.getElementById('regKcal').value)||null,herba:DEFAULT_HERBA_PRODUCTS.slice(),myFoods:[],createdAt:new Date().toISOString()};
-  var ids=getAllUserIds();ids.push(uid);saveAllUserIds(ids);saveProfile(uid,profile);
+  var profile={
+    name:name, email:email, pwHash:hashPassword(pw),
+    age:parseInt(document.getElementById('regAge').value)||null,
+    weight:parseFloat(document.getElementById('regWeight').value)||null,
+    height:parseFloat(document.getElementById('regHeight').value)||null,
+    proteinTarget:parseInt(document.getElementById('regProtein').value)||DEFAULT_PROTEIN_TARGET,
+    calTarget:parseInt(document.getElementById('regKcal').value)||null,
+    herba:DEFAULT_HERBA_PRODUCTS.slice(), myFoods:[], createdAt:new Date().toISOString()
+  };
+  // Sla profiel op EERST, dan pas de id-lijst — zodat getUserByEmail het altijd vindt
+  saveProfile(uid, profile);
+  var ids = JSON.parse(localStorage.getItem('protrack_users')||'[]');
+  if (ids.indexOf(uid) === -1) ids.push(uid);
+  localStorage.setItem('protrack_users', JSON.stringify(ids));
+  // Verifieer opslag
+  var verify = localStorage.getItem('protrack_profile_'+uid);
+  console.log('[Register] uid:', uid, 'email:', email, 'profile saved:', !!verify, 'ids:', ids);
   showToast('Welkom, '+name+'! 🎉');loginAs(uid);
 });
 
@@ -506,6 +550,27 @@ function loginAs(uid){
   showScreen('dash');
 }
 function logout(){activeUserId=null;localStorage.removeItem('protrack_active_user');viewingDate=null;showScreen('auth');}
+
+// Hulp bij inlogproblemen
+document.getElementById('btnShowReset').addEventListener('click', function() {
+  var rawIds = localStorage.getItem('protrack_users');
+  var ids = rawIds ? JSON.parse(rawIds) : [];
+  var info = 'Accounts in dit apparaat: ' + ids.length + '\n';
+  ids.forEach(function(id) {
+    var raw = localStorage.getItem('protrack_profile_' + id);
+    if (raw) {
+      var p = JSON.parse(raw);
+      info += '• ' + (p.email || '?') + ' (' + (p.name || '?') + ')\n';
+    }
+  });
+  if (ids.length === 0) info += '(geen accounts gevonden)\n';
+  info += '\nWil je alle data wissen en opnieuw beginnen?';
+  if (confirm(info)) {
+    Object.keys(localStorage).filter(function(k){return k.startsWith('protrack_');}).forEach(function(k){localStorage.removeItem(k);});
+    alert('Data gewist. Je kan nu een nieuw account aanmaken.');
+    location.reload();
+  }
+});
 
 // ═══════════════════════════════════════════════════════════════
 // DASHBOARD
