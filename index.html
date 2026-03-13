@@ -17,93 +17,48 @@
 <body>
 <div id="app">
 
-  <!-- ═══════════════════════════════════
-       SCREEN: AUTH (login / registratie)
-       ═══════════════════════════════════ -->
+  <!-- AUTH -->
   <div id="screen-auth" class="screen active">
     <div class="auth-hero">
       <div class="logo-mark">P</div>
       <h1 class="app-title">ProTrack</h1>
       <p class="app-sub">Jouw persoonlijke proteïne tracker</p>
     </div>
-
     <div class="auth-tabs">
       <button class="auth-tab auth-tab-active" id="tabLogin">Inloggen</button>
       <button class="auth-tab" id="tabRegister">Registreren</button>
     </div>
-
-    <!-- LOGIN -->
     <div class="auth-form" id="loginForm">
-      <div class="field-group">
-        <label>E-mailadres</label>
-        <input type="email" id="loginEmail" placeholder="naam@email.com" autocomplete="email" inputmode="email" />
-      </div>
-      <div class="field-group">
-        <label>Wachtwoord</label>
-        <input type="password" id="loginPw" placeholder="Jouw wachtwoord" autocomplete="current-password" />
-      </div>
+      <div class="field-group"><label>E-mailadres</label><input type="email" id="loginEmail" placeholder="naam@email.com" autocomplete="email" inputmode="email" /></div>
+      <div class="field-group"><label>Wachtwoord</label><input type="password" id="loginPw" placeholder="Jouw wachtwoord" autocomplete="current-password" /></div>
       <div class="auth-error hidden" id="loginError"></div>
       <button class="btn btn-primary" id="btnLogin" style="width:100%;margin-top:8px">Inloggen</button>
     </div>
-
-    <!-- REGISTRATIE -->
     <div class="auth-form hidden" id="registerForm">
-      <div class="field-group">
-        <label>Naam</label>
-        <input type="text" id="regName" placeholder="bijv. Sarah" maxlength="30" />
-      </div>
-      <div class="field-group">
-        <label>E-mailadres</label>
-        <input type="email" id="regEmail" placeholder="naam@email.com" autocomplete="email" inputmode="email" />
+      <div class="field-group"><label>Naam</label><input type="text" id="regName" placeholder="bijv. Sarah" maxlength="30" /></div>
+      <div class="field-group"><label>E-mailadres</label><input type="email" id="regEmail" placeholder="naam@email.com" autocomplete="email" inputmode="email" /></div>
+      <div class="field-row">
+        <div class="field-group"><label>Wachtwoord</label><input type="password" id="regPw" placeholder="Min. 4 tekens" autocomplete="new-password" /></div>
+        <div class="field-group"><label>Bevestig</label><input type="password" id="regPw2" placeholder="Herhaal" autocomplete="new-password" /></div>
       </div>
       <div class="field-row">
-        <div class="field-group">
-          <label>Wachtwoord</label>
-          <input type="password" id="regPw" placeholder="Min. 4 tekens" autocomplete="new-password" />
-        </div>
-        <div class="field-group">
-          <label>Bevestig</label>
-          <input type="password" id="regPw2" placeholder="Herhaal" autocomplete="new-password" />
-        </div>
+        <div class="field-group"><label>Leeftijd</label><input type="number" id="regAge" placeholder="28" min="10" max="100" /></div>
+        <div class="field-group"><label>Gewicht (kg)</label><input type="number" id="regWeight" placeholder="65" step="0.1" /></div>
       </div>
       <div class="field-row">
-        <div class="field-group">
-          <label>Leeftijd</label>
-          <input type="number" id="regAge" placeholder="28" min="10" max="100" />
-        </div>
-        <div class="field-group">
-          <label>Gewicht (kg)</label>
-          <input type="number" id="regWeight" placeholder="65" min="30" max="250" step="0.1" />
-        </div>
+        <div class="field-group"><label>Lengte (cm)</label><input type="number" id="regHeight" placeholder="170" /></div>
+        <div class="field-group"><label>BMI</label><div class="bmi-badge" id="regBMI">&#8212;</div></div>
       </div>
       <div class="field-row">
-        <div class="field-group">
-          <label>Lengte (cm)</label>
-          <input type="number" id="regHeight" placeholder="170" min="100" max="250" />
-        </div>
-        <div class="field-group">
-          <label>BMI</label>
-          <div class="bmi-badge" id="regBMI">—</div>
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field-group">
-          <label>Proteïne doel (g)</label>
-          <input type="number" id="regProtein" value="110" min="40" max="400" />
-        </div>
-        <div class="field-group">
-          <label>Calorie doel</label>
-          <input type="number" id="regKcal" placeholder="2000" min="500" max="6000" />
-        </div>
+        <div class="field-group"><label>Proteïne doel (g)</label><input type="number" id="regProtein" value="110" min="40" max="400" /></div>
+        <div class="field-group"><label>Calorie doel</label><input type="number" id="regKcal" placeholder="2000" min="500" max="6000" /></div>
       </div>
       <div class="auth-error hidden" id="registerError"></div>
       <button class="btn btn-primary" id="btnRegister" style="width:100%;margin-top:8px">Account aanmaken</button>
     </div>
   </div>
 
-  <!-- ═══════════════════════════════════
-       SCREEN: DASHBOARD
-       ═══════════════════════════════════ -->
+  <!-- DASHBOARD -->
   <div id="screen-dash" class="screen hidden">
     <header class="top-bar">
       <div class="top-bar-left">
@@ -117,13 +72,6 @@
         <button class="icon-btn" id="btnOpenProfile" title="Profiel">&#9881;</button>
       </div>
     </header>
-
-    <div class="health-strip">
-      <span class="health-icon">&#127822;</span>
-      <span class="health-label">Apple Health calorieën vandaag</span>
-      <input type="number" id="healthKcal" class="health-input" placeholder="0" min="0" max="9999" />
-      <span class="health-unit">kcal</span>
-    </div>
 
     <section class="progress-hero">
       <div class="hero-rings">
@@ -169,7 +117,7 @@
       <p class="dynamic-message" id="dynamicMsg"></p>
     </section>
 
-    <section class="auto-plan-section">
+    <section class="auto-plan-section" id="autoPlanSection">
       <button class="btn btn-plan" id="btnAutoPlan">
         <span>&#129302;</span><span>Auto Plan Mijn Dag</span>
       </button>
@@ -189,89 +137,62 @@
     </section>
 
     <section class="history-section">
-      <h2 class="section-title">7 dagen geschiedenis</h2>
+      <h2 class="section-title">7 dagen &#8212; klik een dag om terug te kijken</h2>
       <div class="chart-wrap" id="historyChart"></div>
     </section>
     <div style="height:40px"></div>
   </div>
 
-  <!-- ═══════════════════════════════════
-       SCREEN: PROFIEL
-       ═══════════════════════════════════ -->
+  <!-- PROFIEL -->
   <div id="screen-profile" class="screen hidden">
     <header class="top-bar">
       <button class="icon-btn" id="btnBackFromProfile">&#8592; Terug</button>
-      <span class="top-bar-name">Profiel bewerken</span>
+      <span class="top-bar-name">Profiel</span>
       <button class="btn btn-primary small" id="btnSaveProfile">Opslaan</button>
     </header>
     <div class="profile-form">
-      <div class="field-group">
-        <label>Naam</label>
-        <input type="text" id="profName" maxlength="30" />
-      </div>
-      <div class="field-group">
-        <label>E-mailadres</label>
-        <input type="email" id="profEmail" disabled style="opacity:0.5" />
-        <span class="field-hint">E-mail kan niet worden gewijzigd</span>
+      <div class="field-group"><label>Naam</label><input type="text" id="profName" maxlength="30" /></div>
+      <div class="field-group"><label>E-mailadres</label><input type="email" id="profEmail" disabled style="opacity:0.5" /><span class="field-hint">E-mail kan niet worden gewijzigd</span></div>
+      <div class="field-row">
+        <div class="field-group"><label>Leeftijd</label><input type="number" id="profAge" min="10" max="100" /></div>
+        <div class="field-group"><label>Gewicht (kg)</label><input type="number" id="profWeight" step="0.1" /></div>
       </div>
       <div class="field-row">
-        <div class="field-group">
-          <label>Leeftijd</label>
-          <input type="number" id="profAge" min="10" max="100" />
-        </div>
-        <div class="field-group">
-          <label>Gewicht (kg)</label>
-          <input type="number" id="profWeight" step="0.1" />
-        </div>
+        <div class="field-group"><label>Lengte (cm)</label><input type="number" id="profHeight" /></div>
+        <div class="field-group"><label>BMI</label><div class="bmi-badge" id="profBMI">&#8212;</div></div>
       </div>
       <div class="field-row">
-        <div class="field-group">
-          <label>Lengte (cm)</label>
-          <input type="number" id="profHeight" />
-        </div>
-        <div class="field-group">
-          <label>BMI</label>
-          <div class="bmi-badge" id="profBMI">&#8212;</div>
-        </div>
-      </div>
-      <div class="field-row">
-        <div class="field-group">
-          <label>Proteïne doel (g)</label>
-          <input type="number" id="profProteinTarget" />
-        </div>
-        <div class="field-group">
-          <label>Calorie doel (kcal)</label>
-          <input type="number" id="profCalTarget" />
-        </div>
+        <div class="field-group"><label>Proteïne doel (g)</label><input type="number" id="profProteinTarget" /></div>
+        <div class="field-group"><label>Calorie doel (kcal)</label><input type="number" id="profCalTarget" /></div>
       </div>
 
       <div class="section-divider">Wachtwoord wijzigen</div>
-      <div class="field-group">
-        <label>Huidig wachtwoord</label>
-        <input type="password" id="profPwCurrent" placeholder="Huidig wachtwoord" autocomplete="current-password" />
-      </div>
-      <div class="field-group">
-        <label>Nieuw wachtwoord</label>
-        <input type="password" id="profPwNew" placeholder="Leeg laten = geen wijziging" autocomplete="new-password" />
+      <div class="field-group"><label>Huidig wachtwoord</label><input type="password" id="profPwCurrent" placeholder="Huidig wachtwoord" autocomplete="current-password" /></div>
+      <div class="field-group"><label>Nieuw wachtwoord</label><input type="password" id="profPwNew" placeholder="Leeg laten = geen wijziging" autocomplete="new-password" /></div>
+
+      <!-- EIGEN VOEDINGSMIDDELEN BIBLIOTHEEK -->
+      <div class="section-divider">&#128218; Mijn voedingsmiddelen</div>
+      <p class="helper-text">Voeg hier je eigen maaltijden of ingrediënten toe. Ze verschijnen bovenaan in de bibliotheek bij het loggen.</p>
+      <div id="myFoodsList"></div>
+      <div class="herba-add-card">
+        <div class="field-group"><label>Naam</label><input type="text" id="myFoodName" placeholder="bijv. Mijn proteïnepap" /></div>
+        <div class="field-row">
+          <div class="field-group"><label>Proteïne (g)</label><input type="number" id="myFoodProtein" placeholder="25" min="0" max="300" /></div>
+          <div class="field-group"><label>Calorieën (kcal)</label><input type="number" id="myFoodKcal" placeholder="320" min="0" max="3000" /></div>
+        </div>
+        <div class="field-group"><label>Portie omschrijving</label><input type="text" id="myFoodServing" placeholder="bijv. 1 kom, 200g, 1 glas" /></div>
+        <button class="btn btn-primary" id="btnAddMyFood" style="width:100%;margin-top:6px">+ Toevoegen aan mijn bibliotheek</button>
       </div>
 
+      <!-- HERBALIFE -->
       <div class="section-divider">&#127809; Herbalife bibliotheek</div>
       <p class="helper-text">Jouw Herbalife producten — eenmalig toevoegen, overal loggen</p>
       <div id="herbaList"></div>
       <div class="herba-add-card">
-        <div class="field-group">
-          <label>Productnaam</label>
-          <input type="text" id="herbaName" placeholder="bijv. Formula 1 Shake" />
-        </div>
+        <div class="field-group"><label>Productnaam</label><input type="text" id="herbaName" placeholder="bijv. Formula 1 Shake" /></div>
         <div class="field-row">
-          <div class="field-group">
-            <label>Proteïne (g)</label>
-            <input type="number" id="herbaProtein" placeholder="17" min="0" max="200" />
-          </div>
-          <div class="field-group">
-            <label>Calorieën (kcal)</label>
-            <input type="number" id="herbaKcal" placeholder="220" min="0" max="1000" />
-          </div>
+          <div class="field-group"><label>Proteïne (g)</label><input type="number" id="herbaProtein" placeholder="17" min="0" max="200" /></div>
+          <div class="field-group"><label>Calorieën (kcal)</label><input type="number" id="herbaKcal" placeholder="220" min="0" max="1000" /></div>
         </div>
         <button class="btn btn-primary" id="btnAddHerba" style="width:100%;margin-top:6px">+ Product toevoegen</button>
       </div>
@@ -285,9 +206,7 @@
 
 </div><!-- /#app -->
 
-<!-- ═══════════════════════════════════
-     MODAL: VOEDSEL TOEVOEGEN
-     ═══════════════════════════════════ -->
+<!-- VOEDSEL MODAL -->
 <div id="foodModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
@@ -306,37 +225,52 @@
     </div>
     <div class="modal-tab-pane hidden" id="tabManual">
       <div class="manual-form">
-        <div class="field-group">
-          <label>Naam <span class="req">*</span></label>
-          <input type="text" id="manualFoodName" placeholder="bijv. Kippenwrap" autocomplete="off" maxlength="80" />
-        </div>
+        <div class="field-group"><label>Naam <span class="req">*</span></label><input type="text" id="manualFoodName" placeholder="bijv. Kippenwrap" autocomplete="off" maxlength="80" /></div>
         <div class="field-row">
-          <div class="field-group">
-            <label>Proteïne (g) <span class="req">*</span></label>
-            <input type="number" id="manualFoodProtein" placeholder="32" min="0" max="300" step="0.5" inputmode="decimal" />
-          </div>
-          <div class="field-group">
-            <label>Calorieën (kcal)</label>
-            <input type="number" id="manualFoodCal" placeholder="420" min="0" max="3000" inputmode="numeric" />
-            <span class="field-hint">Optioneel</span>
-          </div>
+          <div class="field-group"><label>Proteïne (g) <span class="req">*</span></label><input type="number" id="manualFoodProtein" placeholder="32" min="0" max="300" step="0.5" inputmode="decimal" /></div>
+          <div class="field-group"><label>Calorieën (kcal)</label><input type="number" id="manualFoodCal" placeholder="420" min="0" max="3000" inputmode="numeric" /><span class="field-hint">Optioneel</span></div>
         </div>
         <div class="manual-preview" id="manualPreview"></div>
         <div class="validation-msg hidden" id="manualValidation"></div>
-        <button class="btn btn-primary" id="btnAddManual" style="width:100%;margin-top:4px">&#10003; Toevoegen aan maaltijd</button>
+        <!-- Opslaan in bibliotheek -->
+        <div class="save-to-lib-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="chkSaveToLib" />
+            <span>Opslaan in mijn bibliotheek</span>
+          </label>
+          <div class="field-group hidden" id="servingField" style="margin-top:6px">
+            <label>Portie</label><input type="text" id="manualFoodServing" placeholder="bijv. 1 portie, 200g" />
+          </div>
+        </div>
+        <button class="btn btn-primary" id="btnAddManual" style="width:100%;margin-top:8px">&#10003; Toevoegen aan maaltijd</button>
       </div>
     </div>
     <div class="modal-tab-pane hidden" id="tabHerba">
       <p class="helper-text" style="margin-bottom:10px">Tik op een product om het te loggen</p>
       <div class="food-grid" id="herbaGrid"></div>
-      <p class="helper-text hidden" id="herbaModalHint">Nog geen producten — ga naar &#9881; Profiel &#8594; Herbalife.</p>
+      <p class="helper-text hidden" id="herbaModalHint">Nog geen producten &#8212; ga naar &#9881; Profiel &#8594; Herbalife.</p>
+    </div>
+
+    <!-- PORTIE PICKER (inline onderaan modal) -->
+    <div id="portionPicker" class="portion-picker hidden">
+      <div class="portion-picker-inner">
+        <div class="portion-food-name" id="portionFoodName"></div>
+        <div class="portion-controls">
+          <button class="portion-btn" id="btnPortionMinus">&#8722;</button>
+          <span class="portion-qty" id="portionQtyDisplay">1&#215;</span>
+          <button class="portion-btn" id="btnPortionPlus">&#43;</button>
+        </div>
+        <div class="portion-totals" id="portionTotals"></div>
+        <div class="portion-actions">
+          <button class="btn btn-ghost small" id="btnPortionCancel">Annuleer</button>
+          <button class="btn btn-primary" id="btnPortionConfirm">&#10003; Voeg toe</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════
-     MODAL: AUTO PLAN
-     ═══════════════════════════════════ -->
+<!-- AUTO PLAN MODAL -->
 <div id="planModal" class="modal-overlay hidden" role="dialog" aria-modal="true">
   <div class="modal-sheet modal-sheet-tall">
     <div class="modal-handle"></div>
@@ -357,5 +291,11 @@
 
 <div id="toast" class="toast hidden"></div>
 <script src="app.js"></script>
+<script>
+  // Toon/verberg portie omschrijving veld bij checkbox
+  document.getElementById('chkSaveToLib').addEventListener('change', function() {
+    document.getElementById('servingField').classList.toggle('hidden', !this.checked);
+  });
+</script>
 </body>
 </html>
